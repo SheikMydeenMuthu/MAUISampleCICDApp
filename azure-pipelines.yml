@@ -25,7 +25,7 @@ steps:
   displayName: 'Download Keystore'
   name: keystore
   inputs:
-    secureFileName: 'sheik-release-key.jks'
+    secureFile: 'sheik-release-key.jks'
 
 - script: |
     dotnet publish -c $(buildConfiguration) -f net10.0-android `
