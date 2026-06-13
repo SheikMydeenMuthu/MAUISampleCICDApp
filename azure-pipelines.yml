@@ -6,7 +6,6 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  keystorePath: '$(Build.SourcesDirectory)\sheik-release-key.jks'
 
 steps:
 
@@ -15,17 +14,10 @@ steps:
   inputs:
     version: '10.x'
 
-- task: Cache@2
-  displayName: 'Cache MAUI Workload'
-  inputs:
-    key: 'maui-workload | "$(Agent.OS)"'
-    path: 'C:\Users\VssAdministrator\.dotnet\workloads'
-    cacheHitVar: 'MAUI_WORKLOAD_CACHED'
+- script: dotnet workload install maui-android maui-ios maui-maccatalyst
+  displayName: 'Install MAUI Workloads'
 
-- script: dotnet workload install maui-android
-  displayName: 'Install MAUI Android Workload'
-  condition: ne(variables['MAUI_WORKLOAD_CACHED'], 'true')
-- script: dotnet restore
+- script: dotnet restore MAUISampleCICDApp/MAUISampleCICDApp.csproj
   displayName: 'Restore NuGet Packages'
 
 - task: DownloadSecureFile@1
