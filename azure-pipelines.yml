@@ -35,16 +35,16 @@ steps:
   displayName: 'Install MAUI Workloads'
   condition: ne(variables['MAUI_WORKLOAD_CACHED'], 'true')
 
+- script: npm install -g firebase-tools
+  displayName: 'Install Firebase CLI'
+  condition: ne(variables['FIREBASE_CLI_CACHED'], 'true')
+
 - task: Cache@2
   displayName: 'Cache Firebase CLI'
   inputs:
     key: 'firebase-tools | "$(Agent.OS)"'
     path: 'C:\Users\VssAdministrator\AppData\Roaming\npm'
     cacheHitVar: 'FIREBASE_CLI_CACHED'
-
-- script: npm install -g firebase-tools
-  displayName: 'Install Firebase CLI'
-  condition: ne(variables['FIREBASE_CLI_CACHED'], 'true')
 
 - script: dotnet restore MAUISampleCICDApp/MAUISampleCICDApp.csproj
   displayName: 'Restore NuGet Packages'
