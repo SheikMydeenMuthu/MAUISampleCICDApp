@@ -5,7 +5,9 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  buildConfiguration: 'Release'
+  - name: buildConfiguration
+    value: 'Release'
+  - group: MAUI Secret
 
 steps:
 
@@ -70,10 +72,14 @@ steps:
     artifactName: 'maui-android-apk'
 
 - pwsh: |
-    $apkPath = Get-ChildItem -Path $(Build.ArtifactStagingDirectory) -Filter "*-Signed.apk" -Recurse | Select-Object -First 1
+    $apkPath = Get-ChildItem -Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY -Filter "*-Signed.apk" -Recurse | Select-Object -First 1
     firebase appdistribution:distribute $apkPath.FullName `
-      --app $(firebaseAppId) `
-      --token $(firebaseToken) `
-      --groups $(firebaseReleaseGroup) `
-      --release-notes "Build from pipeline $(Build.BuildNumber)"
+      --app $env:FIREBASEAPPID `
+      --token $env:FIREBASETOKEN `
+      --groups $env:FIREBASERELEASEGROUP `
+      --release-notes "Build from pipeline $env:BUILD_BUILDNUMBER"
   displayName: 'Distribute to Firebase App Distribution'
+  env:
+    FIREBASEAPPID: $(firebaseAppId)
+    FIREBASETOKEN: $(firebaseToken)
+    FIREBASERELEASEGROUP: $(firebaseReleaseGroup)
