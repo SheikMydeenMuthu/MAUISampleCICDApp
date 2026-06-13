@@ -35,7 +35,8 @@ steps:
     secureFile: 'sheik-release-key.jks'
 
 - script: |
-    dotnet publish -c $(buildConfiguration) -f net10.0-android `
+    dotnet publish MAUISampleCICDApp/MAUISampleCICDApp.csproj `
+      -c $(buildConfiguration) -f net10.0-android `
       /p:AndroidSigningKeyStore=$(keystore.secureFilePath) `
       /p:AndroidSigningKeyAlias=sheik-key-alias `
       /p:AndroidSigningKeyPass=$(keyPassword) `
