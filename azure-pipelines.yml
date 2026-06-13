@@ -1,0 +1,51 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  keystorePath: '$(Build.SourcesDirectory)\sheik-release-key.jks'
+
+steps:
+
+- task: UseDotNet@2
+  displayName: 'Install .NET SDK'
+  inputs:
+    version: '10.x'
+
+- task: Cache@2
+  displayName: 'Cache MAUI Workload'
+  inputs:
+    key: 'maui-workload | "$(Agent.OS)"'
+    path: 'C:\Users\VssAdministrator\.dotnet\workloads'
+    cacheHitVar: 'MAUI_WORKLOAD_CACHED'
+
+- script: dotnet workload install maui-android
+  displayName: 'Install MAUI Android Workload'
+  condition: ne(variables['MAUI_WORKLOAD_CACHED'], 'true')
+- script: dotnet restore
+  displayName: 'Restore NuGet Packages'
+
+- task: DownloadSecureFile@1
+  displayName: 'Download Keystore'
+  name: keystore
+  inputs:
+    secureFile: 'sheik-release-key.jks'
+
+- script: |
+    dotnet publish -c $(buildConfiguration) -f net10.0-android `
+      /p:AndroidSigningKeyStore=$(keystore.secureFilePath) `
+      /p:AndroidSigningKeyAlias=sheik-key-alias `
+      /p:AndroidSigningKeyPass=$(keyPassword) `
+      /p:AndroidSigningStorePass=$(keystorePassword) `
+      -o $(Build.ArtifactStagingDirectory)
+  displayName: 'Build & Sign MAUI Android APK'
+  workingDirectory: '$(Build.SourcesDirectory)\MAUISampleCICDApp'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish APK Artifact'
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'maui-android-apk'
