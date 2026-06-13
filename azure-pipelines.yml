@@ -25,14 +25,14 @@ steps:
   name: keystore
   inputs:
     secureFile: 'sheik-release-key.jks'
-
+    
 - script: |
-    dotnet publish MAUISampleCICDApp/MAUISampleCICDApp.csproj `
-      -c $(buildConfiguration) -f net10.0-android `
-      /p:AndroidSigningKeyStore=$(keystore.secureFilePath) `
-      /p:AndroidSigningKeyAlias=sheik-key-alias `
-      /p:AndroidSigningKeyPass=$(keyPassword) `
-      /p:AndroidSigningStorePass=$(keystorePassword) `
+    dotnet publish MAUISampleCICDApp/MAUISampleCICDApp.csproj ^
+      -c $(buildConfiguration) -f net10.0-android ^
+      /p:AndroidSigningKeyStore=$(keystore.secureFilePath) ^
+      /p:AndroidSigningKeyAlias=sheik-key-alias ^
+      /p:AndroidSigningKeyPass=$(keyPassword) ^
+      /p:AndroidSigningStorePass=$(keystorePassword) ^
       -o $(Build.ArtifactStagingDirectory)
   displayName: 'Build & Sign MAUI Android APK'
 
