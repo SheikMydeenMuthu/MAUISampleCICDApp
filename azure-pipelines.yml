@@ -42,7 +42,6 @@ steps:
       /p:AndroidSigningStorePass=$(keystorePassword) `
       -o $(Build.ArtifactStagingDirectory)
   displayName: 'Build & Sign MAUI Android APK'
-  workingDirectory: '$(Build.SourcesDirectory)\MAUISampleCICDApp'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish APK Artifact'
