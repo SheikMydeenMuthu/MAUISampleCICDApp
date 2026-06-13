@@ -9,13 +9,40 @@ variables:
 
 steps:
 
+- task: Cache@2
+  displayName: 'Cache .NET SDK'
+  inputs:
+    key: 'dotnet-sdk | "$(Agent.OS)"'
+    path: 'C:\hostedtoolcache\windows\dotnet'
+    cacheHitVar: 'DOTNET_CACHED'
+
 - task: UseDotNet@2
   displayName: 'Install .NET SDK'
   inputs:
     version: '10.x'
+  condition: ne(variables['DOTNET_CACHED'], 'true')
+
+- task: Cache@2
+  displayName: 'Cache MAUI Workload'
+  inputs:
+    key: 'maui-workload | "$(Agent.OS)"'
+    path: 'C:\Users\VssAdministrator\.dotnet\workloads'
+    cacheHitVar: 'MAUI_WORKLOAD_CACHED'
 
 - script: dotnet workload install maui-android maui-ios maui-maccatalyst
   displayName: 'Install MAUI Workloads'
+  condition: ne(variables['MAUI_WORKLOAD_CACHED'], 'true')
+
+- task: Cache@2
+  displayName: 'Cache Firebase CLI'
+  inputs:
+    key: 'firebase-tools | "$(Agent.OS)"'
+    path: 'C:\Users\VssAdministrator\AppData\Roaming\npm'
+    cacheHitVar: 'FIREBASE_CLI_CACHED'
+
+- script: npm install -g firebase-tools
+  displayName: 'Install Firebase CLI'
+  condition: ne(variables['FIREBASE_CLI_CACHED'], 'true')
 
 - script: dotnet restore MAUISampleCICDApp/MAUISampleCICDApp.csproj
   displayName: 'Restore NuGet Packages'
@@ -41,9 +68,6 @@ steps:
   inputs:
     pathToPublish: '$(Build.ArtifactStagingDirectory)'
     artifactName: 'maui-android-apk'
-
-- script: npm install -g firebase-tools
-  displayName: 'Install Firebase CLI'
 
 - pwsh: |
     $apkPath = Get-ChildItem -Path $(Build.ArtifactStagingDirectory) -Filter "*-Signed.apk" -Recurse | Select-Object -First 1
