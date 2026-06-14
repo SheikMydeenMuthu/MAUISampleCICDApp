@@ -31,7 +31,7 @@ steps:
     path: 'C:\Users\VssAdministrator\.dotnet\workloads'
     cacheHitVar: 'MAUI_WORKLOAD_CACHED'
 
-- script: dotnet workload install maui-android maui-ios maui-maccatalyst
+- script: dotnet workload install maui-android
   displayName: 'Install MAUI Workloads'
   condition: ne(variables['MAUI_WORKLOAD_CACHED'], 'true')
 
